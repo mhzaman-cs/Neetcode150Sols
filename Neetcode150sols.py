@@ -105,4 +105,142 @@ class Solution:
             return l
         return -1
 
+# Easy (12/6/2023): https://leetcode.com/problems/reverse-linked-list/submissions/
 
+# Definition for singly-linked list.
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+
+
+class Solution:
+    def reverseList(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        prevNode = None
+        cur_node=head
+        while cur_node:
+           tempNode = cur_node.next
+           cur_node.next = prevNode
+           prevNode = cur_node
+           cur_node = tempNode
+        return prevNode
+
+# Not accepted solution, but one with accumulator variable
+def linkListRev(curNode, prevNode):
+  if curNode == None:
+    return prevNode
+  tempNode = curNode.next
+  curNode.next = prevNode
+  linkListRev(tempNode, curNode)
+
+
+class Solution:
+  def reverseList(self, head: Optional[ListNode]) -> Optional[ListNode]:
+    if not head:
+      return None
+    newHead = head
+    if head.next:
+      newHead = self.reverseList(head.next)
+      head.next.next = head
+    head.next = None
+    return newHead
+
+# Easy (12/7/2023): https://leetcode.com/problems/merge-two-sorted-lists/submissions/
+
+# Definition for singly-linked list.
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+
+class Solution:
+    def mergeTwoLists(self, list1: Optional[ListNode], list2: Optional[ListNode]) -> Optional[ListNode]:
+      head = ListNode()
+      tail = head 
+      
+      while list1 and list2:
+        if list2.val <= list1.val:
+          tail.next = list2
+          list2 = list2.next
+        else:
+          tail.next = list1
+          list1 = list1.next
+        tail = tail.next
+
+      if list1:
+        tail.next = list1 
+      if list2:
+        tail.next = list2
+      
+      return head.next
+
+class Solution:
+    def mergeTwoLists(self, list1: Optional[ListNode], list2: Optional[ListNode]) -> Optional[ListNode]:
+      if not list1:
+        return list2
+      if not list2:
+        return list1
+
+      if (list1.val < list2.val):
+        list1.next = self.mergeTwoLists(list1.next, list2)
+        return list1
+      else:
+        list2.next = self.mergeTwoLists(list1, list2.next)
+        return list2
+
+# Easy (12/7/2023): https://leetcode.com/problems/linked-list-cycle/
+
+# Definition for singly-linked list.
+class ListNode:
+    def __init__(self, x):
+        self.val = x
+        self.next = None
+
+class Solution:
+    def hasCycle(self, head: Optional[ListNode]) -> bool:
+        if not head or not head.next:
+          return False 
+        f, s = head, head
+        while (s and f):
+            if (s.next and f.next and f.next.next):
+                s, f = s.next, f.next.next
+            else:
+                return False
+            if s == f:
+                return True
+
+        return False
+
+# Easy (12/7/2023): https://leetcode.com/problems/invert-binary-tree/
+
+# Definition for a binary tree node.
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+class Solution:
+    def invertTree(self, root: Optional[TreeNode]) -> Optional[TreeNode]:
+        if not root or (not root.left and not root.right):
+            return root
+        
+        tempNode = root.left
+        root.left = self.invertTree(root.right)
+        root.right = self.invertTree(tempNode)
+        return root
+
+# Easy (12/7/2023): https://leetcode.com/problems/maximum-depth-of-binary-tree/
+
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+class Solution:
+    def maxDepth(self, root: Optional[TreeNode]) -> int:
+        if not root:
+            return 0
+
+        return max(1 + self.maxDepth(root.right), 1 + self.maxDepth(root.left))
