@@ -10,7 +10,7 @@ class Solution:
         return False 
         
 
-# Easy (12/5/2023): https://leetcode.com/problems/valid-anagram/submissions/
+# Easy (12/5/2023): https://leetcode.com/problems/valid-anagram/
 
 class Solution:
     def isAnagram(self, s: str, t: str) -> bool:
@@ -32,7 +32,7 @@ class Solution:
 
         return wordCountS == wordCountT
 
-# Easy (12/5/2023): https://leetcode.com/problems/two-sum/submissions/
+# Easy (12/5/2023): https://leetcode.com/problems/two-sum/
 
 class Solution:
     def twoSum(self, nums: List[int], target: int) -> List[int]:
@@ -45,7 +45,7 @@ class Solution:
                 return [i, needatIndex[num]]
             needatIndex[cur_diff] = i
 
-# Easy (12/5/2023): https://leetcode.com/problems/valid-palindrome/submissions/
+# Easy (12/5/2023): https://leetcode.com/problems/valid-palindrome/
 
 class Solution:
     def isPalindrome(self, s: str) -> bool:
@@ -82,7 +82,7 @@ class Solution:
                     return False
         return not inputStack
 
-# Easy (12/5/2023): https://leetcode.com/problems/binary-search/submissions/
+# Easy (12/5/2023): https://leetcode.com/problems/binary-search/
 
 class Solution:
     def search(self, nums: List[int], target: int) -> int:
@@ -105,7 +105,7 @@ class Solution:
             return l
         return -1
 
-# Easy (12/6/2023): https://leetcode.com/problems/reverse-linked-list/submissions/
+# Easy (12/6/2023): https://leetcode.com/problems/reverse-linked-list/
 
 # Definition for singly-linked list.
 class ListNode:
@@ -145,7 +145,7 @@ class Solution:
     head.next = None
     return newHead
 
-# Easy (12/7/2023): https://leetcode.com/problems/merge-two-sorted-lists/submissions/
+# Easy (12/7/2023): https://leetcode.com/problems/merge-two-sorted-lists/
 
 # Definition for singly-linked list.
 class ListNode:
@@ -244,3 +244,33 @@ class Solution:
             return 0
 
         return max(1 + self.maxDepth(root.right), 1 + self.maxDepth(root.left))
+
+# Easy (12/7/2023): https://leetcode.com/problems/diameter-of-binary-tree/
+
+# Definition for a binary tree node.
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+class Solution:
+    def diameterOfBinaryTree(self, root: Optional[TreeNode]) -> int:
+        max_diam = 0
+
+        def dfs(root):
+            nonlocal max_diam
+            if not root:
+                return 0
+
+            left = dfs(root.left)
+            right = dfs(root.right)
+
+            max_diam = max(left + right, max_diam)
+
+            return 1 + max(left, right)
+
+        dfs(root)
+        return max_diam
+
+        
