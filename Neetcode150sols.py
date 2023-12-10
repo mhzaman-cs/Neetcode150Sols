@@ -245,7 +245,7 @@ class Solution:
 
         return max(1 + self.maxDepth(root.right), 1 + self.maxDepth(root.left))
 
-# Easy (12/7/2023): https://leetcode.com/problems/diameter-of-binary-tree/
+# Easy (12/8/2023): https://leetcode.com/problems/diameter-of-binary-tree/
 
 # Definition for a binary tree node.
 class TreeNode:
@@ -273,4 +273,111 @@ class Solution:
         dfs(root)
         return max_diam
 
+# Easy (12/9/2023): https://leetcode.com/problems/balanced-binary-tree/
+
+# Definition for a binary tree node.
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+class Solution:
+    def isBalanced(self, root: Optional[TreeNode]) -> bool:
+        isHeightBalenced = True
+
+        def treeHeight(root):
+            nonlocal isHeightBalenced
+            if not root:
+                return 0
+
+            leftHeaight = treeHeight(root.left)
+            rightHeaight = treeHeight(root.right)
+
+            if abs(leftHeaight - rightHeaight) > 1 or not isHeightBalenced:
+                isHeightBalenced = False
+                return 0
+
+            return 1 + max(leftHeaight, rightHeaight)
         
+        treeHeight(root)
+
+        return isHeightBalenced
+
+# Easy (12/9/2023): https://leetcode.com/problems/same-tree/
+
+# Definition for a binary tree node.
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+class Solution:
+    def isSameTree(self, p: Optional[TreeNode], q: Optional[TreeNode]) -> bool:
+        if not p and not q:
+            return True
+
+        if not p or not q:
+            return False
+        
+        return (p.val == q.val) and self.isSameTree(p.right, q.right) and self.isSameTree(p.left, q.left)
+
+# Easy (12/9/2023): https://leetcode.com/problems/subtree-of-another-tree/
+
+# Definition for a binary tree node.
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+class Solution:
+    def isSubtree(self, root: Optional[TreeNode], subRoot: Optional[TreeNode]) -> bool:
+        if not subRoot:
+            return True
+        if not root and subRoot:
+            return False
+        return self.isSameTree(root, subRoot) or self.isSubtree(root.left, subRoot) or self.isSubtree(root.right, subRoot)  
+    
+    def isSameTree(self, root, subRoot):
+        if not root and not subRoot:
+            return True
+        if not root or not subRoot:
+            return False
+        return root.val == subRoot.val and self.isSameTree(root.right, subRoot.right) and self.isSameTree(root.left, subRoot.left)
+
+# Easy (12/9/2023): https://leetcode.com/problems/meeting-rooms/
+# Definition of Interval:
+class Interval(object):
+    def __init__(self, start, end):
+        self.start = start
+        self.end = end
+
+
+class Solution:
+    def can_attend_meetings(self, intervals: List[Interval]) -> bool:
+        lenItervals = len(intervals)
+        intervals.sort(key = lambda x: x.start)
+        for i in range(lenItervals - 1):
+            if intervals[i].end > intervals[i+1].start:
+                return False
+        return True
+
+# Easy (12/9/2023): https://leetcode.com/problems/number-of-1-bits/
+
+class Solution:
+    def hammingWeight(self, n: int) -> int:
+        curCount = 0
+        for i in str(bin(n))[2:]:
+            if i == '1':
+                curCount+=1
+        return curCount
+
+class Solution:
+    def hammingWeight(self, n: int) -> int:
+        curCount = 0
+        while (n > 0):
+            curCount += n & 1
+            n = n >> 1
+        return curCount
