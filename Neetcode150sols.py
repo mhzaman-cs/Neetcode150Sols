@@ -105,6 +105,24 @@ class Solution:
             return l
         return -1
 
+
+# Easy (12/6/2023): https://leetcode.com/problems/best-time-to-buy-and-sell-stock/
+
+class Solution:
+    def maxProfit(self, prices: List[int]) -> int:
+        l, r = 0, 1
+        maxProfit =  0
+        lenPrices = len(prices) 
+
+        while (r < lenPrices):
+            maxProfit = max(maxProfit, prices[r] - prices[l])
+            if (prices[r] < prices[l]):
+                l, r = r, r+1
+            else:
+                r+=1
+
+        return maxProfit
+
 # Easy (12/6/2023): https://leetcode.com/problems/reverse-linked-list/
 
 # Definition for singly-linked list.
@@ -346,6 +364,16 @@ class Solution:
         if not root or not subRoot:
             return False
         return root.val == subRoot.val and self.isSameTree(root.right, subRoot.right) and self.isSameTree(root.left, subRoot.left)
+
+# Easy (12/9/2023): https://leetcode.com/problems/climbing-stairs/
+class Solution:
+    def climbStairs(self, n: int) -> int:
+        one = two = 1
+
+        for i in range(n-1):
+            one, two = one + two, one
+
+        return one
 
 # Easy (12/9/2023): https://leetcode.com/problems/meeting-rooms/
 # Definition of Interval:
