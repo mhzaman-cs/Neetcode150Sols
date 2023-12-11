@@ -409,3 +409,80 @@ class Solution:
             curCount += n & 1
             n = n >> 1
         return curCount
+
+# Easy (12/10/2023): https://leetcode.com/problems/counting-bits/
+
+class Solution:
+    def countBits(self, n: int) -> List[int]:
+        res = []
+        for i in range(n+1):
+            curCount = 0
+            k = i
+            while k:
+                curCount += k & 1
+                k = k >> 1
+            res.append(curCount)
+
+        return res
+
+class Solution:
+    def countBits(self, n: int) -> List[int]:
+        mostSig = 1
+        result = [0] * (n+1)
+
+        if n >= 0:
+            result[0] = 0
+        if n >= 1:
+            result[1] = 1
+
+        for i in range(2, n+1):
+            if mostSig*2 == i:
+                mostSig = i
+            result[i] = 1 + result[i - mostSig]
+
+        return result
+
+# Easy (12/10/2023): https://leetcode.com/problems/reverse-bits/
+
+class Solution:
+    def reverseBits(self, n: int) -> int:
+        res = 0
+        for i in range(32):
+            res = res | (((n >> i) & 1) << (31-i))
+        return res
+
+# Easy (12/10/2023): https://leetcode.com/problems/missing-number/
+
+class Solution:
+    def missingNumber(self, nums: List[int]) -> int:
+        return sum([x for x in range(len(nums) + 1)]) - sum(nums)
+
+class Solution:
+    def missingNumber(self, nums: List[int]) -> int:
+        n = len(nums)
+        r_nums = r_range = 0
+        for i in nums:
+            r_nums = r_nums ^ i
+        
+        for i in range(n+1):
+            r_range = r_range ^ i
+        return r_nums ^ r_range
+
+# Easy (12/10/2023): https://leetcode.com/problems/group-anagrams/
+
+class Solution:
+    def groupAnagrams(self, strs: List[str]) -> List[List[str]]:
+        hash_map_array = []
+        result_array = []
+
+        for word in strs:
+            char_count = {}
+            for cur_char in word:
+                char_count[cur_char] = char_count.get(cur_char, 0) + 1
+            if (char_count in hash_map_array):
+                result_array[hash_map_array.index(char_count)].append(word)
+            else:
+                hash_map_array.append(char_count)
+                result_array.append([word])
+
+        return result_array
