@@ -486,3 +486,51 @@ class Solution:
                 result_array.append([word])
 
         return result_array
+
+# Easy (12/11/2023): https://leetcode.com/problems/top-k-frequent-elements/
+
+class Solution:
+    def topKFrequent(self, nums: List[int], k: int) -> List[int]:
+        freq_map = {}
+        for n in nums:
+            freq_map[n] = freq_map.get(n, 0) + 1
+        
+
+        sorted_freq_map = sorted(freq_map.items(), key=lambda x:-x[1])
+
+        result = []
+        num_count = 0
+        for num in sorted_freq_map:
+            if k  - num_count == 0:
+                break 
+            result.append(num[0])
+            num_count+=1
+
+        return result
+
+# Easy (12/11/2023): https://leetcode.com/problems/product-of-array-except-self/
+
+class Solution:
+    def productExceptSelf(self, nums: List[int]) -> List[int]:
+        range_vals = {}
+        lenNums = len(nums)
+        res = [] * lenNums
+        cur_product_f = 1
+        for i in range(lenNums):
+            cur_product_f *= nums[i]
+            range_vals[(0, i)] = cur_product_f
+
+        cur_product_b = 1
+        for i in range(lenNums-1, -1, -1):
+            cur_product_b *= nums[i]
+            range_vals[(i, lenNums-1)] = cur_product_b
+
+        for i in range(lenNums):
+            if i == 0:
+                res.append(range_vals[(min(lenNums-1, i+1), lenNums-1)])
+            elif i == lenNums-1:
+                res.append(range_vals[(0, max(i-1, 0))])
+            else:
+                res.append(range_vals[(0, max(i-1, 0))] * range_vals[(min(lenNums-1, i+1), lenNums-1)])
+
+        return res
