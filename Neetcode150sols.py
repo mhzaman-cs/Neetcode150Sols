@@ -534,3 +534,116 @@ class Solution:
                 res.append(range_vals[(0, max(i-1, 0))] * range_vals[(min(lenNums-1, i+1), lenNums-1)])
 
         return res
+
+# Easy (12/12/2023): https://www.lintcode.com/problem/659/
+
+class Solution:
+    def encode(self, strs):
+        aux_str = ""
+        for word in strs:
+            aux_str += str(len(word))+ "%" + word
+        return aux_str
+
+    def decode(self, str):
+        res = []
+        i, lenStr = 0, len(str)
+        lenJump, lenJumpStr = 0, ""
+
+        while i < lenStr:
+            if str[i] == "%":
+                lenJump = int(lenJumpStr)
+                res.append(str[i+1:i+1+lenJump])
+                i = lenJump+i+1
+                lenJumpStr = ""
+            else:
+                lenJumpStr += str[i]
+                i+=1
+        return res
+
+# Easy (12/12/2023): https://leetcode.com/problems/longest-consecutive-sequence/as 
+
+class Solution:
+    def longestConsecutive(self, nums: List[int]) -> int:
+        set_nums = set(nums)
+        max_cons = 0
+
+        for n in set_nums:
+            if n-1 not in set_nums:
+                cur_num = n+1
+                cur_cons = 1
+                while cur_num in set_nums:
+                    cur_cons += 1
+                    cur_num += 1
+                max_cons = max(max_cons, cur_cons)
+        
+        return max_cons
+
+# Easy (12/13/2023): https://leetcode.com/problems/3sum/
+
+class Solution:
+    def threeSum(self, nums: List[int]) -> List[List[int]]:
+        nums.sort()
+        res = []
+        i = 0
+        lenNums = len(nums)
+        while i < lenNums and nums[i] <= 0:
+            if i+1 >= lenNums-1:
+                break
+            l, r = i+1, lenNums-1
+            while l < r:
+                val_i, val_r, val_l = nums[i], nums[r], nums[l]
+                cur_sum = val_i + val_r + val_l
+                if cur_sum == 0:
+                    if [nums[i], nums[l], nums[r]] not in res:
+                        res.append([nums[i], nums[l], nums[r]])
+                    r -= 1
+                    l += 1
+                elif cur_sum > 0:
+                    r -= 1
+                else:
+                    l += 1
+            i += 1
+
+            
+        return res
+
+# Easy (12/13/2023): https://leetcode.com/problems/container-with-most-water/
+
+class Solution:
+    def maxArea(self, height: List[int]) -> int:
+        l, r = 0, len(height)-1
+        maxVol = 0
+        while l < r:
+            maxVol = max((r - l) * min(height[l], height[r]), maxVol)
+
+            if height[l] < height[r]:
+                l+=1
+            else:
+                r-=1
+        return maxVol
+
+# Easy (12/14/2023): https://leetcode.com/problems/container-with-most-water/
+
+class Solution:
+    def lengthOfLongestSubstring(self, s: str) -> int:
+        lenS = len(s)
+        if lenS <= 1:
+            return lenS 
+
+        maxSLen = 0
+        l, r = 0, 1
+        while l < r and r < lenS:
+            curStr = s[l:r]
+            lenCurS = len(curStr)
+            if s[r] not in curStr:
+                r += 1
+            else:
+                maxSLen = max(lenCurS, maxSLen)
+                while s[r] in curStr and l < r:
+                    l += 1
+                    curStr = s[l:r]
+                r +=1
+        
+        maxSLen = max(len(s[l:r]), maxSLen)
+        
+        return maxSLen
