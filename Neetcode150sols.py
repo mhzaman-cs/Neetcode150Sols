@@ -468,7 +468,7 @@ class Solution:
             r_range = r_range ^ i
         return r_nums ^ r_range
 
-# Easy (12/10/2023): https://leetcode.com/problems/group-anagrams/
+# Medium (12/10/2023): https://leetcode.com/problems/group-anagrams/
 
 class Solution:
     def groupAnagrams(self, strs: List[str]) -> List[List[str]]:
@@ -487,7 +487,7 @@ class Solution:
 
         return result_array
 
-# Easy (12/11/2023): https://leetcode.com/problems/top-k-frequent-elements/
+# Medium (12/11/2023): https://leetcode.com/problems/top-k-frequent-elements/
 
 class Solution:
     def topKFrequent(self, nums: List[int], k: int) -> List[int]:
@@ -508,7 +508,7 @@ class Solution:
 
         return result
 
-# Easy (12/11/2023): https://leetcode.com/problems/product-of-array-except-self/
+# Medium (12/11/2023): https://leetcode.com/problems/product-of-array-except-self/
 
 class Solution:
     def productExceptSelf(self, nums: List[int]) -> List[int]:
@@ -535,7 +535,7 @@ class Solution:
 
         return res
 
-# Easy (12/12/2023): https://www.lintcode.com/problem/659/
+# Medium (12/12/2023): https://www.lintcode.com/problem/659/
 
 class Solution:
     def encode(self, strs):
@@ -560,7 +560,7 @@ class Solution:
                 i+=1
         return res
 
-# Easy (12/12/2023): https://leetcode.com/problems/longest-consecutive-sequence/as 
+# Medium (12/12/2023): https://leetcode.com/problems/longest-consecutive-sequence/
 
 class Solution:
     def longestConsecutive(self, nums: List[int]) -> int:
@@ -578,7 +578,7 @@ class Solution:
         
         return max_cons
 
-# Easy (12/13/2023): https://leetcode.com/problems/3sum/
+# Medium (12/13/2023): https://leetcode.com/problems/3sum/
 
 class Solution:
     def threeSum(self, nums: List[int]) -> List[List[int]]:
@@ -607,7 +607,7 @@ class Solution:
             
         return res
 
-# Easy (12/13/2023): https://leetcode.com/problems/container-with-most-water/
+# Medium (12/13/2023): https://leetcode.com/problems/container-with-most-water/
 
 class Solution:
     def maxArea(self, height: List[int]) -> int:
@@ -622,7 +622,7 @@ class Solution:
                 r-=1
         return maxVol
 
-# Easy (12/14/2023): https://leetcode.com/problems/container-with-most-water/
+# Medium (12/14/2023): https://leetcode.com/problems/longest-substring-without-repeating-characters/
 
 class Solution:
     def lengthOfLongestSubstring(self, s: str) -> int:
@@ -647,3 +647,41 @@ class Solution:
         maxSLen = max(len(s[l:r]), maxSLen)
         
         return maxSLen
+
+# Medium (12/21/2023): https://leetcode.com/problems/longest-repeating-character-replacement/
+
+class Solution:
+    def characterReplacement(self, s: str, k: int) -> int:
+        freq_map = {}
+        max_freq = 1
+        max_len = 1
+        lenS = len(s)
+        l = 0
+
+        for r in range(lenS):
+            freq_map[s[r]] = freq_map.get(s[r], 0) + 1
+            max_freq = max(max_freq, freq_map[s[r]])
+
+            if (r - l + 1) - max_freq > k:
+                freq_map[s[l]] -= 1
+                l += 1
+            
+            max_len = max(max_len, r-l+1)
+
+        return max_len
+
+# Medium (12/21/2023): https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/
+
+class Solution:
+    def findMin(self, nums: List[int]) -> int:
+        l, r = 0, len(nums) - 1
+        cur_min= nums[0]
+        while l < r:
+            mid = (l+r)//2
+            cur_min=min(nums[mid], cur_min)
+            
+            if nums[mid] > nums[r]:
+                l = mid + 1
+            else:
+                r = mid - 1
+        return min(cur_min, nums[l])
