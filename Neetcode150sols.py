@@ -685,3 +685,127 @@ class Solution:
             else:
                 r = mid - 1
         return min(cur_min, nums[l])
+
+# Medium (12/22/2023): https://leetcode.com/problems/search-in-rotated-sorted-array/
+
+class Solution:
+    def search(self, nums: List[int], target: int) -> int:
+        l, r = 0, len(nums)-1
+        not_found = -1
+        while l <= r:
+            mid = (l+r)//2
+            if nums[mid] == target:
+                return mid
+            elif ((nums[r] < nums[mid] or target > nums[mid]) and nums[r] >= target) or (target > nums[mid] and nums[r] < target and nums[mid] > nums[l]):
+                l = mid + 1
+            else:
+                r = mid - 1
+        return not_found
+        
+# Medium (12/25/2023): https://leetcode.com/problems/reorder-list/
+
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+class Solution:
+    def reorderList(self, head: Optional[ListNode]) -> None:
+        """
+        Do not return anything, modify head in-place instead.
+        """
+        cur_p = f = s = head
+
+        while f and f.next:
+            f = f.next.next
+            s = s.next
+        s.next, s = None, s.next
+        
+        prev_p = None
+        while s:
+            s.next, prev_p, s = prev_p, s, s.next
+        s = prev_p
+        
+        while s:
+            cur_p.next, s.next, s, cur_p = s, cur_p.next, s.next, cur_p.next
+
+# Medium (12/25/2023): https://leetcode.com/problems/remove-nth-node-from-end-of-list/
+
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+class Solution:
+    def removeNthFromEnd(self, head: Optional[ListNode], n: int) -> Optional[ListNode]:
+
+        cur_p = end_p = head
+
+        while n >= 0:
+            if not end_p:
+                return head.next
+            end_p = end_p.next
+            n -= 1
+        
+        while end_p:
+            cur_p, end_p = cur_p.next, end_p.next
+        
+        cur_p.next = cur_p.next.next 
+        return head
+
+# Medium (12/27/2023): https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/
+
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution:
+    def lowestCommonAncestor(self, root: 'TreeNode', p: 'TreeNode', q: 'TreeNode') -> 'TreeNode':
+        cur_p = root
+
+        while cur_p:
+            if (p.val > cur_p.val) and (q.val > cur_p.val):
+                cur_p = cur_p.right
+            elif (p.val < cur_p.val) and (q.val < cur_p.val):
+                cur_p = cur_p.left
+            else:
+                return cur_p
+
+
+# Medium (12/28/2023): https://leetcode.com/problems/binary-tree-level-order-traversal/
+
+from collections import deque
+
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def levelOrder(self, root: Optional[TreeNode]) -> List[List[int]]:
+        if not root:
+            return []
+        
+        results = [[]]
+        treeD, num_treeD_level = deque([root]), 1
+
+        while treeD:
+            cur_n = treeD.popleft()
+            num_treeD_level -= 1
+
+            if cur_n.left: 
+                treeD.append(cur_n.left)
+            if cur_n.right: 
+                treeD.append(cur_n.right)
+            
+            results[-1].append(cur_n.val)
+            
+            if num_treeD_level == 0 and len(treeD) != 0:
+                results.append([])
+                num_treeD_level = len(treeD)
+        return results
+        
