@@ -808,4 +808,204 @@ class Solution:
                 results.append([])
                 num_treeD_level = len(treeD)
         return results
+
+# Medium (12/28/2023): https://leetcode.com/problems/validate-binary-search-tree/
+
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def isValidBST(self, root: Optional[TreeNode]) -> bool:
+        
+        def validRangeBST(root, left, right):
+            if not root:
+                return True
+            if root.val > left and root.val < right:
+                return validRangeBST(root.left, left, root.val) and validRangeBST(root.right, root.val, right)
+            else:
+                return False
+        
+        return validRangeBST(root, float('-inf'), float('inf'))
+
+# Medium (12/28/2023): https://leetcode.com/problems/kth-smallest-element-in-a-bst/
+
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def kthSmallest(self, root: Optional[TreeNode], k: int) -> int:
+
+
+        sorted_array = []
+
+        def returnVals(root):
+            if not root:
+                return
+            returnVals(root.left)
+            sorted_array.append(root.val)
+            returnVals(root.right)
+        
+        returnVals(root)
+
+        # print(sorted_array)
+
+        return sorted_array[k-1]
+
+# Medium (12/28/2023): https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/
+
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def buildTree(self, preorder: List[int], inorder: List[int]) -> Optional[TreeNode]:
+        
+        def createNodes(preorder, inorder):
+            if not preorder:
+                return None
+
+            root, inorder_index  = TreeNode(preorder[0]), inorder.index(preorder[0])
+
+            left_inorder = inorder[:inorder_index]
+            len_left_inorder = len(left_inorder)+1
+            
+            root.left = createNodes(preorder[1: len_left_inorder], left_inorder)
+            root.right = createNodes(preorder[len_left_inorder:], inorder[inorder_index+1:])
+            return root
+
+        return createNodes(preorder, inorder)
+
+# Medium (12/28/2023): https://leetcode.com/problems/number-of-islands/
+
+# DFS:
+
+class Solution:
+    def numIslands(self, grid: List[List[str]]) -> int:
+        len_c, len_r = len(grid[0]), len(grid)
+        num_islands = 0
+        visted_coords = set()
+
+        def dfs(r, c):
+            if grid[r][c] == "1":
+                visted_coords.add((r, c))
+                directions = [[0,1], [-1, 0], [0, -1], [1,0]]
+
+                for (inc_r, inc_c) in directions:
+                    dr, dc = r+inc_r, c+inc_c 
+                    if dr >= 0 and dr < len_r and dc >= 0 and dc < len_c and grid[dr][dc] == "1" and (dr, dc) not in visted_coords:
+                        dfs(dr, dc)
+
+        for r in range(len_r):
+            for c in range(len_c):
+                if grid[r][c] == "1" and (r, c) not in visted_coords:
+                    dfs(r, c)
+                    num_islands += 1
+
+        return num_islands
+
+# BFS:
+    
+from collections import deque
+
+class Solution:
+    def numIslands(self, grid: List[List[str]]) -> int:
+        len_c, len_r = len(grid[0]), len(grid)
+        num_islands = 0
+        visted_coords = set()
+
+        def bfs(r, c):
+
+            q = deque([(r,c)])
+
+            while q:
+                cr, cc = q.popleft()
+                directions = [[0, 1], [1, 0], [-1, 0], [0, -1]]
+                for inc_r, inc_c in directions:
+                    dr, dc = cr + inc_r, cc + inc_c
+                    if (dr >= 0 and dr < len_r and 
+                    dc >= 0 and dc < len_c and 
+                    grid[dr][dc] == "1" and 
+                    (dr, dc) not in visted_coords):
+                        visted_coords.add((dr, dc))
+                        q.append((dr, dc))
+
+        for r in range(len_r):
+            for c in range(len_c):
+                if grid[r][c] == "1" and (r, c) not in visted_coords:
+                    bfs(r, c)
+                    num_islands += 1
+
+        return num_islands
+
+# Medium (12/30/2023): https://leetcode.com/problems/clone-graph/
+
+"""
+# Definition for a Node.
+class Node:
+    def __init__(self, val = 0, neighbors = None):
+        self.val = val
+        self.neighbors = neighbors if neighbors is not None else []
+"""
+
+from typing import Optional
+class Solution:
+    def cloneGraph(self, node: Optional['Node']) -> Optional['Node']:
+        visted_nodes = {}
+        def create_graph(node):
+            if node in visted_nodes:
+                return visted_nodes[node]
+
+            root = Node(node.val)
+            visted_nodes[node] = root
+            for cur_node in node.neighbors:
+                root.neighbors.append(create_graph(cur_node))
+            return root
+        
+        return create_graph(node) if node else None
+
+# Medium (12/30/2023): https://leetcode.com/problems/pacific-atlantic-water-flow/
+
+class Solution:
+    def pacificAtlantic(self, heights: List[List[int]]) -> List[List[int]]:
+        len_r, len_c = len(heights), len(heights[0])
+        visit_pacific = set()
+        visit_atlantic = set()
+
+        def dfs(r, c, visted, prevHeight):
+            if (r < 0 or r >= len_r or 
+            c < 0 or c >= len_c or 
+            (r,c) in visted or 
+            heights[r][c] < prevHeight):
+                return
+            visted.add((r,c))
+            directions = [(0,1), (1,0), (-1,0), (0,-1)]
+            for inc_r, inc_c in directions:
+                dfs(r+inc_r, c+inc_c, visted, heights[r][c])
+
+
+        for r in range(len_r):
+            dfs(r, 0, visit_pacific, heights[r][0])
+            dfs(r, len_c-1, visit_atlantic, heights[r][len_c-1])
+        
+        for c in range(len_c):
+            dfs(0, c, visit_pacific, heights[0][c])
+            dfs(len_r-1, c, visit_atlantic, heights[len_r-1][c])
+        
+        results = []
+
+        for r in range(len_r):
+            for c in range(len_c):
+                if (r, c) in visit_pacific and (r,c) in visit_atlantic:
+                    results.append([r, c])
+
+        return results
+
         
