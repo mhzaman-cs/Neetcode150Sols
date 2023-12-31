@@ -1008,4 +1008,37 @@ class Solution:
 
         return results
 
+
+class Solution:
+    def canFinish(self, numCourses: int, prerequisites: List[List[int]]) -> bool:
+        preReqMap = {i:[] for i in range(numCourses)}
+
+        for crs, preq in prerequisites:
+            preReqMap[crs].append(preq)
+
+        def dfs(crs, visted):
+            if crs in visted:
+                print(visted, crs, preReqMap)
+                return False
+            if preReqMap[crs] == []:
+                return True
+            visted.add(crs)
+
+            for crs_preq in preReqMap[crs]:
+                if not dfs(crs_preq, visted):
+                    return False
+            preReqMap[crs] = []
+            visted.remove(crs)
+            return True
+
+        for c in range(numCourses):
+            if not dfs(c, set()):
+                return False
+
+        return True
+
+
+
+
         
+            
