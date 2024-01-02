@@ -1008,6 +1008,7 @@ class Solution:
 
         return results
 
+# Medium (12/30/2023): https://leetcode.com/problems/course-schedule/
 
 class Solution:
     def canFinish(self, numCourses: int, prerequisites: List[List[int]]) -> bool:
@@ -1018,7 +1019,6 @@ class Solution:
 
         def dfs(crs, visted):
             if crs in visted:
-                print(visted, crs, preReqMap)
                 return False
             if preReqMap[crs] == []:
                 return True
@@ -1037,8 +1037,306 @@ class Solution:
 
         return True
 
+# Medium (12/30/2023): https://www.lintcode.com/problem/3651/
 
+class Solution:
+    def count_components(self, n: int, edges: List[List[int]]) -> int:
+        parents = [i for i in range(n)]
+        rank = [1] * n
+        cur_nodes = n
 
+        def find(node):
+            cur_node = node
+            while cur_node != parents[cur_node]:
+                parents[cur_node] = parents[parents[cur_node]]
+                cur_node = parents[cur_node]
+            return cur_node
 
-        
+        def union(node1, node2):
+            p1, p2 = find(node1), find(node2)
+            if p1 == p2:
+                return 0
+            if rank[p1] >= rank[p2]:
+                rank[p1] += rank[p2] 
+                parents[p2] = p1
+            else:
+                rank[p2] += rank[p1] 
+                parents[p1] = p2
+            return 1
+
+        for a, b in edges:
+            cur_nodes -= union(a, b)
+
+        return cur_nodes
+
+# Medium (12/31/2023): https://leetcode.com/problems/number-of-provinces/
+
+class Solution:
+    def findCircleNum(self, isConnected: List[List[int]]) -> int:
+        num_cities = len(isConnected[0])
+        parents = [i for i in range(num_cities)]
+        rank = [1] * num_cities
+        num_cities_left = num_cities
+
+        def find(node):
+            cur_node = node
+            while cur_node != parents[cur_node]:
+                parents[cur_node] = parents[parents[cur_node]]
+                cur_node = parents[cur_node]
             
+            return cur_node
+
+        def union(n1, n2):
+            p1, p2 = find(n1), find(n2)
+
+            if p1 == p2:
+                return 0
+            
+            if rank[p1] >= rank[p2]:
+                rank[p1] += rank[p2]
+                parents[p2] = p1
+            else:
+                rank[p2] += rank[p1]
+                parents[p1] = p2
+
+            return 1
+
+        for i in range(num_cities):
+            for j in range(num_cities):
+                if isConnected[i][j] == 1:
+                    num_cities_left -= union(i, j)
+
+        return num_cities_left
+
+# Medium (1/1/2024): https://www.lintcode.com/problem/178/
+
+from typing import (
+    List,
+)
+
+class Solution:
+    """
+    @param n: An integer
+    @param edges: a list of undirected edges
+    @return: true if it's a valid tree, or false
+    """
+    def valid_tree(self, n: int, edges: List[List[int]]) -> bool:
+        edges_map = {i:[] for i in range(n)}
+        if not edges:
+            return n == 1
+        for a,b in edges:
+            edges_map[a].append(b)
+            edges_map[b].append(a)
+
+        visted_set = set()
+        def dfs(node, prevVal):
+            if node in visted_set:
+                return False
+            visted_set.add(node)
+            for nei in edges_map[node]:
+                if prevVal == nei:
+                    continue
+                if not dfs(nei, node):
+                    return False
+            return True
+
+        if not dfs(0, -1):
+            return False
+
+        if len(visted_set) == n:
+            return True
+        return False 
+
+# Medium (1/1/2024): https://leetcode.com/problems/insert-interval/
+
+class Solution:
+    def insert(self, intervals: List[List[int]], newInterval: List[int]) -> List[List[int]]:
+        intervals.append([float('inf'), float('inf')])
+        s, e = newInterval
+        len_inter = len(intervals)
+        for i in range(len_inter):
+            if e < intervals[i][0]:
+                if i == 0 or intervals[i-1][1] < s:
+                    return intervals[:i] + [newInterval] + intervals[i:len_inter-1]               
+                d = i-1
+                while (d > 0 and s <= intervals[d-1][1]):
+                    d -= 1
+                return intervals[:d] + [[min(intervals[d][0], s), max(e, intervals[i-1][1])]] + intervals[i:len_inter-1]
+
+# Medium (1/1/2024): https://leetcode.com/problems/merge-intervals/
+
+class Solution:
+    def merge(self, intervals: List[List[int]]) -> List[List[int]]:
+        intervals.sort(key=lambda x : x[0])
+        len_intervals = len(intervals)
+        res = []
+        cur_interval = intervals[0]
+        for i in range(1, len_intervals):
+            if cur_interval[1] < intervals[i][0]:
+                res.append(cur_interval)
+                cur_interval = intervals[i]
+            else:
+                cur_interval = [min(cur_interval[0], intervals[i][0]), max(cur_interval[1], intervals[i][1])]
+        res.append(cur_interval)
+        return res
+
+# Medium (1/1/2024): https://leetcode.com/problems/non-overlapping-intervals/
+
+class Solution:
+    def eraseOverlapIntervals(self, intervals: List[List[int]]) -> int:
+        intervals.sort()
+        cur_removed = 0
+        curr_end = intervals[0][1]
+        intervals.pop(0)
+        for start, end in intervals:
+            if start < curr_end:
+                cur_removed += 1
+                curr_end = min(end, curr_end)
+            else:
+                curr_end = end
+
+        return cur_removed
+
+# Medium (1/1/2024): https://www.lintcode.com/problem/919/
+
+from typing import (
+    List,
+)
+from lintcode import (
+    Interval,
+)
+
+"""
+Definition of Interval:
+class Interval(object):
+    def __init__(self, start, end):
+        self.start = start
+        self.end = end
+"""
+
+class Solution:
+    """
+    @param intervals: an array of meeting time intervals
+    @return: the minimum number of conference rooms required
+    """
+    def min_meeting_rooms(self, intervals: List[Interval]) -> int:
+        intervals.sort(key=lambda x : x.start)
+        end_times = [intervals[0].end]
+        intervals.pop(0)
+
+        for i in intervals:
+            start, end = i.start, i.end
+            if start >= min(end_times):
+                end_times.remove(min(end_times))
+                end_times.append(end)
+            else:
+                end_times.append(end)
+        return len(end_times)
+
+# Medium (1/1/2024): https://leetcode.com/problems/house-robber/
+
+# Memoization
+class Solution:
+    def rob(self, nums: List[int]) -> int:
+        memoziation = {}
+        len_array = len(nums)
+        if len_array == 0:
+            return 0
+        if len_array == 1:
+            return nums[0]
+        if len_array == 2:
+            return max(nums[0], nums[1])
+
+        memoziation[len_array-1] = nums[len_array-1]
+        memoziation[len_array-2] = max(nums[len_array-1], nums[len_array-2])
+        
+        for i in range(len_array-3, -1, -1):
+            memoziation[i] = max(nums[i] + memoziation[i+2], memoziation[i+1])
+
+       return memoziation[0]
+
+# Bottom Up
+class Solution:
+    def rob(self, nums: List[int]) -> int:
+        h1, h2, len_nums = 0, 0, len(nums)
+        for n in nums:
+            h2, h1 = max(n+h1, h2), h2
+
+        return h2
+
+# Medium (1/1/2024): https://leetcode.com/problems/house-robber/
+
+class Solution:
+    def rob(self, nums: List[int]) -> int:
+        len_array = len(nums)
+
+        def house_robber(nums):
+            h1 = h2 = 0
+
+            for n in nums:
+                h2, h1 = max(h1+n, h2), h2
+
+            return h2
+
+        return max(nums[0], house_robber(nums[1:]), house_robber(nums[:-1]))
+
+# Medium (1/1/2024): https://leetcode.com/problems/longest-palindromic-substring/
+
+class Solution:
+    def longestPalindrome(self, s: str) -> str:
+        len_s = len(s)
+        max_len = 0
+        max_pal = ""
+
+        for c in range(len_s):
+            # Odd case
+            l, r = c, c
+
+            while (l >=0 and r < len_s  and s[l] == s[r]):
+                if (r -l + 1) > max_len:
+                    max_len = r -l + 1
+                    max_pal = s[l:r+1]
+                l-=1
+                r+=1
+                
+            l, r = c, c+1
+
+            # Even Case
+            while (l >=0 and r < len_s  and s[l] == s[r]):
+                if (r -l + 1) > max_len:
+                    max_len = r -l + 1
+                    max_pal = s[l:r+1]
+                l-=1
+                r+=1
+            
+        return max_pal
+
+# Medium (1/1/2024): https://leetcode.com/problems/palindromic-substrings/
+
+class Solution:
+    def countSubstrings(self, s: str) -> int:
+
+        num_subtrings = 0
+        len_s = len(s)
+
+        for c in range(len_s):
+            l = r = c
+
+            while l>=0 and r<len_s:
+                if s[l] == s[r]:
+                    num_subtrings += 1
+                else:
+                    break
+                l-= 1
+                r+=1
+
+            l, r = c, c+1
+
+            while l>=0 and r<len_s:
+                if s[l] == s[r]:
+                    num_subtrings += 1
+                else:
+                    break
+                l-= 1
+                r+=1
+        return num_subtrings
