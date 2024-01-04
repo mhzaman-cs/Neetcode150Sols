@@ -1340,3 +1340,177 @@ class Solution:
                 l-= 1
                 r+=1
         return num_subtrings
+
+# Medium (1/2/2024): https://leetcode.com/problems/decode-ways/
+
+class Solution:
+    def numDecodings(self, s: str) -> int:
+        one_d, two_d = 1, 0
+
+        len_s = len(s)
+
+        for i in range(len_s-1, -1, -1):
+            cur_val = 0
+            if s[i] == '0':
+                cur_val = 0
+            else:
+                cur_val = one_d
+
+            if (i+1 < len_s and (s[i] == '1' or (s[i] == '2' and s[i+1] in "0123456"))):
+                cur_val += two_d
+
+            one_d, two_d = cur_val, one_d
+        return one_d
+
+# Medium (1/2/2024): https://leetcode.com/problems/coin-change/
+
+# Memoization Solution
+class Solution:
+    def coinChange(self, coins: List[int], amount: int) -> int:
+
+        num_coins = {x:1 for x in coins}
+        def minRequiredCoins(amount):
+            if amount == 0:
+                return 0
+            if amount < 0:
+                return float('inf')
+            if amount in num_coins:
+                return num_coins[amount]
+            min_coins = float('inf')
+            for c in coins:
+                min_coins = min(min_coins, 1+minRequiredCoins(amount - c))
+            num_coins[amount] = min_coins
+            return min_coins
+
+        res =  minRequiredCoins(amount)
+        return res if res != float('inf') else -1
+
+# Dp - backtracking
+class Solution:
+    def coinChange(self, coins: List[int], amount: int) -> int:
+        dp = [float('inf')] * (amount+1)
+        dp[0] = 0
+        for i in range(1, amount+1):
+            min_coins = dp[i]
+            for c in coins:
+                if i-c >= 0:
+                    min_coins = min(min_coins, 1+dp[i-c])
+            dp[i] = min_coins
+        
+        return dp[-1] if dp[-1] != float('inf') else -1
+
+# Medium (1/2/2024): https://leetcode.com/problems/maximum-product-subarray/
+
+class Solution:
+    def maxProduct(self, nums: List[int]) -> int:
+        cur_max, max_pos, max_neg = max(nums), 1, 1
+
+        for n in nums:
+            max_neg, max_pos = min(n, n * max_pos, n * max_neg), max(n, n * max_pos, n * max_neg)
+            cur_max = max(max_pos, cur_max)
+ 
+        return cur_max
+
+# Medium (1/2/2024): https://leetcode.com/problems/word-break/
+
+class Solution:
+    def wordBreak(self, s: str, wordDict: List[str]) -> bool:
+        len_s = len(s)
+        dp = [False] * (len_s+1)
+        dp[len_s] = True
+
+        for i in range(len_s-1, -1, -1):
+            for cur_word in wordDict:
+                if (i+ len(cur_word)) <= len_s and s[i:i+len(cur_word)] == cur_word:
+                    dp[i] = dp[i+len(cur_word)]
+
+                if dp[i]:
+                    break
+        return dp[0]
+
+# Medium (1/2/2024): https://leetcode.com/problems/longest-increasing-subsequence/
+
+class Solution:
+    def lengthOfLIS(self, nums: List[int]) -> int:
+        len_nums = len(nums)
+        dp = [1] * len_nums
+
+        for i in range(len_nums-1, -1, -1):
+            for j in range(i+1, len_nums):
+                if nums[j] > nums[i]:
+                    dp[i] = max(dp[i], 1+dp[j])
+        return max(dp)
+
+# Medium (1/3/2024): https://leetcode.com/problems/unique-paths/
+
+class Solution:
+    def uniquePaths(self, m: int, n: int) -> int:
+        row = [1] * n
+
+        for i in range(m-1):
+            for j in range(n-2, -1, -1):
+                row[j] = row[j + 1] + row[j]
+
+        return row[0]
+
+# Medium (1/3/2024): https://leetcode.com/problems/longest-common-subsequence/
+
+class Solution:
+    def longestCommonSubsequence(self, text1: str, text2: str) -> int:
+        len_1, len_2 = len(text1), len(text2)
+        dp = [[0] * (len_1+1) for _ in range(len_2+1)]
+
+        for i in range(len_1-1, -1, -1):
+            for j in range(len_2-1, -1, -1):
+                if text1[i] == text2[j]:
+                    dp[j][i] = 1+dp[j+1][i+1]
+                else:
+                    dp[j][i] = max(dp[j+1][i], dp[j][i+1])
+
+        return dp[0][0]
+
+# Medium (1/3/2024): https://leetcode.com/problems/maximum-subarray/
+
+class Solution:
+    def maxSubArray(self, nums: List[int]) -> int:
+        l, len_nums = 0, len(nums)
+        max_sum = cur_sum = nums[0]
+        for r in range(1, len_nums):
+            if cur_sum < 0:
+                l = r
+                cur_sum = nums[r]
+            else:
+                cur_sum += nums[r]
+            max_sum = max(cur_sum, max_sum)
+
+        return max_sum
+
+# Medium (1/3/2024): https://leetcode.com/problems/jump-game/
+
+class Solution:
+    def canJump(self, nums: List[int]) -> bool:
+        goal = len(nums) -1
+
+        for i in range(len(nums)-2, -1, -1):
+            if i+nums[i] >= goal:
+                goal  = i
+        return goal == 0
+
+# Medium (1/3/2024): https://leetcode.com/problems/jump-game/
+
+class Solution:
+    def rotate(self, matrix: List[List[int]]) -> None:
+        """
+        Do not return anything, modify matrix in-place instead.
+        """
+
+        l, r = 0, len(matrix)-1
+
+        while l < r:
+            for i in range(r -l):
+                t, b = l, r
+                matrix[t][l+i], matrix[t+i][r], matrix[b][r-i], matrix[b-i][l] = matrix[b-i][l], matrix[t][l+i], matrix[t+i][r], matrix[b][r-i]
+            r -= 1
+            l += 1
+
+        
