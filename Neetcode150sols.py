@@ -1496,7 +1496,7 @@ class Solution:
                 goal  = i
         return goal == 0
 
-# Medium (1/3/2024): https://leetcode.com/problems/jump-game/
+# Medium (1/3/2024): https://leetcode.com/problems/rotate-image/
 
 class Solution:
     def rotate(self, matrix: List[List[int]]) -> None:
@@ -1513,4 +1513,60 @@ class Solution:
             r -= 1
             l += 1
 
+# Medium (1/5/2024): https://leetcode.com/problems/spiral-matrix/
+
+class Solution:
+    def spiralOrder(self, matrix: List[List[int]]) -> List[int]:
+
+        result = []
+        t = l = 0
+        r = len(matrix[0])       
+        b = len(matrix)
+
+        while l < r and t < b:
+            for i in range(l, r):
+                result.append(matrix[t][i])
+            t += 1
+
+            for i in range(t, b):
+                result.append(matrix[i][r-1])
+            r -= 1
+
+            if not (l < r and t < b):
+                break
+            
+            for i in range(r-1, l-1, -1):
+                result.append(matrix[b-1][i])
+            b -= 1
+
+
+            for i in range(b-1, t-1, -1):
+                result.append(matrix[i][l])
+            l += 1
+
+        return result
+
+# Medium (1/5/2024): https://leetcode.com/problems/set-matrix-zeroes/
+
+class Solution:
+    def setZeroes(self, matrix: List[List[int]]) -> None:
+        """
+        Do not return anything, modify matrix in-place instead.
+        """
+        zeros_r = set()
+        zeros_c = set()
+        r, c = len(matrix), len(matrix[0])
+        for i in range(r):
+            for j in range(c):
+                if matrix[i][j] == 0:
+                   zeros_r.add(i)
+                   zeros_c.add(j)
+
+        for cr in zeros_r:
+            for k in range(c):
+                matrix[cr][k] = 0
+
+        for cc in zeros_c:
+            for k in range(r):
+                matrix[k][cc] = 0
         
