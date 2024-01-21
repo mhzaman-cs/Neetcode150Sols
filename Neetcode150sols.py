@@ -1008,4 +1008,565 @@ class Solution:
 
         return results
 
+# Medium (12/30/2023): https://leetcode.com/problems/course-schedule/
+
+class Solution:
+    def canFinish(self, numCourses: int, prerequisites: List[List[int]]) -> bool:
+        preReqMap = {i:[] for i in range(numCourses)}
+
+        for crs, preq in prerequisites:
+            preReqMap[crs].append(preq)
+
+        def dfs(crs, visted):
+            if crs in visted:
+                return False
+            if preReqMap[crs] == []:
+                return True
+            visted.add(crs)
+
+            for crs_preq in preReqMap[crs]:
+                if not dfs(crs_preq, visted):
+                    return False
+            preReqMap[crs] = []
+            visted.remove(crs)
+            return True
+
+        for c in range(numCourses):
+            if not dfs(c, set()):
+                return False
+
+        return True
+
+# Medium (12/30/2023): https://www.lintcode.com/problem/3651/
+
+class Solution:
+    def count_components(self, n: int, edges: List[List[int]]) -> int:
+        parents = [i for i in range(n)]
+        rank = [1] * n
+        cur_nodes = n
+
+        def find(node):
+            cur_node = node
+            while cur_node != parents[cur_node]:
+                parents[cur_node] = parents[parents[cur_node]]
+                cur_node = parents[cur_node]
+            return cur_node
+
+        def union(node1, node2):
+            p1, p2 = find(node1), find(node2)
+            if p1 == p2:
+                return 0
+            if rank[p1] >= rank[p2]:
+                rank[p1] += rank[p2] 
+                parents[p2] = p1
+            else:
+                rank[p2] += rank[p1] 
+                parents[p1] = p2
+            return 1
+
+        for a, b in edges:
+            cur_nodes -= union(a, b)
+
+        return cur_nodes
+
+# Medium (12/31/2023): https://leetcode.com/problems/number-of-provinces/
+
+class Solution:
+    def findCircleNum(self, isConnected: List[List[int]]) -> int:
+        num_cities = len(isConnected[0])
+        parents = [i for i in range(num_cities)]
+        rank = [1] * num_cities
+        num_cities_left = num_cities
+
+        def find(node):
+            cur_node = node
+            while cur_node != parents[cur_node]:
+                parents[cur_node] = parents[parents[cur_node]]
+                cur_node = parents[cur_node]
+            
+            return cur_node
+
+        def union(n1, n2):
+            p1, p2 = find(n1), find(n2)
+
+            if p1 == p2:
+                return 0
+            
+            if rank[p1] >= rank[p2]:
+                rank[p1] += rank[p2]
+                parents[p2] = p1
+            else:
+                rank[p2] += rank[p1]
+                parents[p1] = p2
+
+            return 1
+
+        for i in range(num_cities):
+            for j in range(num_cities):
+                if isConnected[i][j] == 1:
+                    num_cities_left -= union(i, j)
+
+        return num_cities_left
+
+# Medium (1/1/2024): https://www.lintcode.com/problem/178/
+
+from typing import (
+    List,
+)
+
+class Solution:
+    """
+    @param n: An integer
+    @param edges: a list of undirected edges
+    @return: true if it's a valid tree, or false
+    """
+    def valid_tree(self, n: int, edges: List[List[int]]) -> bool:
+        edges_map = {i:[] for i in range(n)}
+        if not edges:
+            return n == 1
+        for a,b in edges:
+            edges_map[a].append(b)
+            edges_map[b].append(a)
+
+        visted_set = set()
+        def dfs(node, prevVal):
+            if node in visted_set:
+                return False
+            visted_set.add(node)
+            for nei in edges_map[node]:
+                if prevVal == nei:
+                    continue
+                if not dfs(nei, node):
+                    return False
+            return True
+
+        if not dfs(0, -1):
+            return False
+
+        if len(visted_set) == n:
+            return True
+        return False 
+
+# Medium (1/1/2024): https://leetcode.com/problems/insert-interval/
+
+class Solution:
+    def insert(self, intervals: List[List[int]], newInterval: List[int]) -> List[List[int]]:
+        intervals.append([float('inf'), float('inf')])
+        s, e = newInterval
+        len_inter = len(intervals)
+        for i in range(len_inter):
+            if e < intervals[i][0]:
+                if i == 0 or intervals[i-1][1] < s:
+                    return intervals[:i] + [newInterval] + intervals[i:len_inter-1]               
+                d = i-1
+                while (d > 0 and s <= intervals[d-1][1]):
+                    d -= 1
+                return intervals[:d] + [[min(intervals[d][0], s), max(e, intervals[i-1][1])]] + intervals[i:len_inter-1]
+
+# Medium (1/1/2024): https://leetcode.com/problems/merge-intervals/
+
+class Solution:
+    def merge(self, intervals: List[List[int]]) -> List[List[int]]:
+        intervals.sort(key=lambda x : x[0])
+        len_intervals = len(intervals)
+        res = []
+        cur_interval = intervals[0]
+        for i in range(1, len_intervals):
+            if cur_interval[1] < intervals[i][0]:
+                res.append(cur_interval)
+                cur_interval = intervals[i]
+            else:
+                cur_interval = [min(cur_interval[0], intervals[i][0]), max(cur_interval[1], intervals[i][1])]
+        res.append(cur_interval)
+        return res
+
+# Medium (1/1/2024): https://leetcode.com/problems/non-overlapping-intervals/
+
+class Solution:
+    def eraseOverlapIntervals(self, intervals: List[List[int]]) -> int:
+        intervals.sort()
+        cur_removed = 0
+        curr_end = intervals[0][1]
+        intervals.pop(0)
+        for start, end in intervals:
+            if start < curr_end:
+                cur_removed += 1
+                curr_end = min(end, curr_end)
+            else:
+                curr_end = end
+
+        return cur_removed
+
+# Medium (1/1/2024): https://www.lintcode.com/problem/919/
+
+from typing import (
+    List,
+)
+from lintcode import (
+    Interval,
+)
+
+"""
+Definition of Interval:
+class Interval(object):
+    def __init__(self, start, end):
+        self.start = start
+        self.end = end
+"""
+
+class Solution:
+    """
+    @param intervals: an array of meeting time intervals
+    @return: the minimum number of conference rooms required
+    """
+    def min_meeting_rooms(self, intervals: List[Interval]) -> int:
+        intervals.sort(key=lambda x : x.start)
+        end_times = [intervals[0].end]
+        intervals.pop(0)
+
+        for i in intervals:
+            start, end = i.start, i.end
+            if start >= min(end_times):
+                end_times.remove(min(end_times))
+                end_times.append(end)
+            else:
+                end_times.append(end)
+        return len(end_times)
+
+# Medium (1/1/2024): https://leetcode.com/problems/house-robber/
+
+# Memoization
+class Solution:
+    def rob(self, nums: List[int]) -> int:
+        memoziation = {}
+        len_array = len(nums)
+        if len_array == 0:
+            return 0
+        if len_array == 1:
+            return nums[0]
+        if len_array == 2:
+            return max(nums[0], nums[1])
+
+        memoziation[len_array-1] = nums[len_array-1]
+        memoziation[len_array-2] = max(nums[len_array-1], nums[len_array-2])
+        
+        for i in range(len_array-3, -1, -1):
+            memoziation[i] = max(nums[i] + memoziation[i+2], memoziation[i+1])
+
+       return memoziation[0]
+
+# Bottom Up
+class Solution:
+    def rob(self, nums: List[int]) -> int:
+        h1, h2, len_nums = 0, 0, len(nums)
+        for n in nums:
+            h2, h1 = max(n+h1, h2), h2
+
+        return h2
+
+# Medium (1/1/2024): https://leetcode.com/problems/house-robber/
+
+class Solution:
+    def rob(self, nums: List[int]) -> int:
+        len_array = len(nums)
+
+        def house_robber(nums):
+            h1 = h2 = 0
+
+            for n in nums:
+                h2, h1 = max(h1+n, h2), h2
+
+            return h2
+
+        return max(nums[0], house_robber(nums[1:]), house_robber(nums[:-1]))
+
+# Medium (1/1/2024): https://leetcode.com/problems/longest-palindromic-substring/
+
+class Solution:
+    def longestPalindrome(self, s: str) -> str:
+        len_s = len(s)
+        max_len = 0
+        max_pal = ""
+
+        for c in range(len_s):
+            # Odd case
+            l, r = c, c
+
+            while (l >=0 and r < len_s  and s[l] == s[r]):
+                if (r -l + 1) > max_len:
+                    max_len = r -l + 1
+                    max_pal = s[l:r+1]
+                l-=1
+                r+=1
+                
+            l, r = c, c+1
+
+            # Even Case
+            while (l >=0 and r < len_s  and s[l] == s[r]):
+                if (r -l + 1) > max_len:
+                    max_len = r -l + 1
+                    max_pal = s[l:r+1]
+                l-=1
+                r+=1
+            
+        return max_pal
+
+# Medium (1/1/2024): https://leetcode.com/problems/palindromic-substrings/
+
+class Solution:
+    def countSubstrings(self, s: str) -> int:
+
+        num_subtrings = 0
+        len_s = len(s)
+
+        for c in range(len_s):
+            l = r = c
+
+            while l>=0 and r<len_s:
+                if s[l] == s[r]:
+                    num_subtrings += 1
+                else:
+                    break
+                l-= 1
+                r+=1
+
+            l, r = c, c+1
+
+            while l>=0 and r<len_s:
+                if s[l] == s[r]:
+                    num_subtrings += 1
+                else:
+                    break
+                l-= 1
+                r+=1
+        return num_subtrings
+
+# Medium (1/2/2024): https://leetcode.com/problems/decode-ways/
+
+class Solution:
+    def numDecodings(self, s: str) -> int:
+        one_d, two_d = 1, 0
+
+        len_s = len(s)
+
+        for i in range(len_s-1, -1, -1):
+            cur_val = 0
+            if s[i] == '0':
+                cur_val = 0
+            else:
+                cur_val = one_d
+
+            if (i+1 < len_s and (s[i] == '1' or (s[i] == '2' and s[i+1] in "0123456"))):
+                cur_val += two_d
+
+            one_d, two_d = cur_val, one_d
+        return one_d
+
+# Medium (1/2/2024): https://leetcode.com/problems/coin-change/
+
+# Memoization Solution
+class Solution:
+    def coinChange(self, coins: List[int], amount: int) -> int:
+
+        num_coins = {x:1 for x in coins}
+        def minRequiredCoins(amount):
+            if amount == 0:
+                return 0
+            if amount < 0:
+                return float('inf')
+            if amount in num_coins:
+                return num_coins[amount]
+            min_coins = float('inf')
+            for c in coins:
+                min_coins = min(min_coins, 1+minRequiredCoins(amount - c))
+            num_coins[amount] = min_coins
+            return min_coins
+
+        res =  minRequiredCoins(amount)
+        return res if res != float('inf') else -1
+
+# Dp - backtracking
+class Solution:
+    def coinChange(self, coins: List[int], amount: int) -> int:
+        dp = [float('inf')] * (amount+1)
+        dp[0] = 0
+        for i in range(1, amount+1):
+            min_coins = dp[i]
+            for c in coins:
+                if i-c >= 0:
+                    min_coins = min(min_coins, 1+dp[i-c])
+            dp[i] = min_coins
+        
+        return dp[-1] if dp[-1] != float('inf') else -1
+
+# Medium (1/2/2024): https://leetcode.com/problems/maximum-product-subarray/
+
+class Solution:
+    def maxProduct(self, nums: List[int]) -> int:
+        cur_max, max_pos, max_neg = max(nums), 1, 1
+
+        for n in nums:
+            max_neg, max_pos = min(n, n * max_pos, n * max_neg), max(n, n * max_pos, n * max_neg)
+            cur_max = max(max_pos, cur_max)
+ 
+        return cur_max
+
+# Medium (1/2/2024): https://leetcode.com/problems/word-break/
+
+class Solution:
+    def wordBreak(self, s: str, wordDict: List[str]) -> bool:
+        len_s = len(s)
+        dp = [False] * (len_s+1)
+        dp[len_s] = True
+
+        for i in range(len_s-1, -1, -1):
+            for cur_word in wordDict:
+                if (i+ len(cur_word)) <= len_s and s[i:i+len(cur_word)] == cur_word:
+                    dp[i] = dp[i+len(cur_word)]
+
+                if dp[i]:
+                    break
+        return dp[0]
+
+# Medium (1/2/2024): https://leetcode.com/problems/longest-increasing-subsequence/
+
+class Solution:
+    def lengthOfLIS(self, nums: List[int]) -> int:
+        len_nums = len(nums)
+        dp = [1] * len_nums
+
+        for i in range(len_nums-1, -1, -1):
+            for j in range(i+1, len_nums):
+                if nums[j] > nums[i]:
+                    dp[i] = max(dp[i], 1+dp[j])
+        return max(dp)
+
+# Medium (1/3/2024): https://leetcode.com/problems/unique-paths/
+
+class Solution:
+    def uniquePaths(self, m: int, n: int) -> int:
+        row = [1] * n
+
+        for i in range(m-1):
+            for j in range(n-2, -1, -1):
+                row[j] = row[j + 1] + row[j]
+
+        return row[0]
+
+# Medium (1/3/2024): https://leetcode.com/problems/longest-common-subsequence/
+
+class Solution:
+    def longestCommonSubsequence(self, text1: str, text2: str) -> int:
+        len_1, len_2 = len(text1), len(text2)
+        dp = [[0] * (len_1+1) for _ in range(len_2+1)]
+
+        for i in range(len_1-1, -1, -1):
+            for j in range(len_2-1, -1, -1):
+                if text1[i] == text2[j]:
+                    dp[j][i] = 1+dp[j+1][i+1]
+                else:
+                    dp[j][i] = max(dp[j+1][i], dp[j][i+1])
+
+        return dp[0][0]
+
+# Medium (1/3/2024): https://leetcode.com/problems/maximum-subarray/
+
+class Solution:
+    def maxSubArray(self, nums: List[int]) -> int:
+        l, len_nums = 0, len(nums)
+        max_sum = cur_sum = nums[0]
+        for r in range(1, len_nums):
+            if cur_sum < 0:
+                l = r
+                cur_sum = nums[r]
+            else:
+                cur_sum += nums[r]
+            max_sum = max(cur_sum, max_sum)
+
+        return max_sum
+
+# Medium (1/3/2024): https://leetcode.com/problems/jump-game/
+
+class Solution:
+    def canJump(self, nums: List[int]) -> bool:
+        goal = len(nums) -1
+
+        for i in range(len(nums)-2, -1, -1):
+            if i+nums[i] >= goal:
+                goal  = i
+        return goal == 0
+
+# Medium (1/3/2024): https://leetcode.com/problems/rotate-image/
+
+class Solution:
+    def rotate(self, matrix: List[List[int]]) -> None:
+        """
+        Do not return anything, modify matrix in-place instead.
+        """
+
+        l, r = 0, len(matrix)-1
+
+        while l < r:
+            for i in range(r -l):
+                t, b = l, r
+                matrix[t][l+i], matrix[t+i][r], matrix[b][r-i], matrix[b-i][l] = matrix[b-i][l], matrix[t][l+i], matrix[t+i][r], matrix[b][r-i]
+            r -= 1
+            l += 1
+
+# Medium (1/5/2024): https://leetcode.com/problems/spiral-matrix/
+
+class Solution:
+    def spiralOrder(self, matrix: List[List[int]]) -> List[int]:
+
+        result = []
+        t = l = 0
+        r = len(matrix[0])       
+        b = len(matrix)
+
+        while l < r and t < b:
+            for i in range(l, r):
+                result.append(matrix[t][i])
+            t += 1
+
+            for i in range(t, b):
+                result.append(matrix[i][r-1])
+            r -= 1
+
+            if not (l < r and t < b):
+                break
+            
+            for i in range(r-1, l-1, -1):
+                result.append(matrix[b-1][i])
+            b -= 1
+
+
+            for i in range(b-1, t-1, -1):
+                result.append(matrix[i][l])
+            l += 1
+
+        return result
+
+# Medium (1/5/2024): https://leetcode.com/problems/set-matrix-zeroes/
+
+class Solution:
+    def setZeroes(self, matrix: List[List[int]]) -> None:
+        """
+        Do not return anything, modify matrix in-place instead.
+        """
+        zeros_r = set()
+        zeros_c = set()
+        r, c = len(matrix), len(matrix[0])
+        for i in range(r):
+            for j in range(c):
+                if matrix[i][j] == 0:
+                   zeros_r.add(i)
+                   zeros_c.add(j)
+
+        for cr in zeros_r:
+            for k in range(c):
+                matrix[cr][k] = 0
+
+        for cc in zeros_c:
+            for k in range(r):
+                matrix[k][cc] = 0
         
