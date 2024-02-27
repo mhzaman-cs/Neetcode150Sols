@@ -28,7 +28,7 @@ class Solution:
         print(transaction_map)
         return invalid_transactions
 
-# Medium (1/20/2024): https://leetcode.com/problems/two-city-scheduling/description/
+# Medium (1/20/2024): https://leetcode.com/problems/two-city-scheduling/
 class Solution:
     def twoCitySchedCost(self, costs: List[List[int]]) -> int:
         costs.sort(key=lambda person: person[0] - person[1])
@@ -201,3 +201,167 @@ class Solution:
                     unhappy.add(pref_f)
                     break
         return len(unhappy)
+
+# Medium (1/20/2024): https://leetcode.com/problems/decode-string/
+    
+class Solution:
+    def decodeString(self, s: str) -> str:
+        stack = []
+        for i in range(len(s)):
+            if s[i] != "]":
+                stack.append(s[i])
+            else:
+                cur_item = stack.pop()
+                aux_str = ""
+                while cur_item != "[":
+                    aux_str = cur_item + aux_str
+                    cur_item = stack.pop()
+
+                str_num = ""
+                while stack and stack[-1].isdigit():
+                    cur_d = stack.pop()
+                    str_num = cur_d + str_num
+                cur_num = int(str_num)
+                stack.append(cur_num * aux_str)
+
+        return "".join(stack)
+
+
+# Medium (1/20/2024): https://leetcode.com/problems/design-search-autocomplete-system/
+    
+from collections import defaultdict
+
+class TrieNode:
+    def __init__(self):
+        self.letters = {}
+        self.frequency = defaultdict(int)
+
+class AutocompleteSystem:
+
+    def __init__(self, sentences: List[str], times: List[int]):
+        self.root = TrieNode()
+        self.current = self.root
+        self.cur_search = []
+
+        for i in range(len(times)):
+            self.add_word(sentences[i], times[i])
+
+    def input(self, c: str) -> List[str]:
+        if c == "#":
+            current_word = "".join(self.cur_search)
+            self.add_word(current_word, 1)
+            self.current = self.root
+            self.cur_search = []
+            return []
+
+        self.cur_search.append(c)
+        if self.current and c in self.current.letters:
+            self.current = self.current.letters[c]
+            return [x[1] for x in heapq.nsmallest(3, [(v, k) for k,v in self.current.frequency.items()])]
+        else:
+            self.current = None
+            return []
+
+        return []
+
+    
+    def add_word(self, word, word_frequency):
+        cur_node = self.root
+        for c in word:
+            if c not in cur_node.letters:
+                cur_node.letters[c] = TrieNode()
+            cur_node = cur_node.letters[c]
+            cur_node.frequency[word] -= word_frequency
+
+        self.root.frequency[word] -= word_frequency
+
+
+# Your AutocompleteSystem object will be instantiated and called as such:
+# obj = AutocompleteSystem(sentences, times)
+# param_1 = obj.input(c)
+
+# Medium (1/21/2024): https://leetcode.com/problems/number-of-connected-components-in-an-undirected-graph/
+
+from collections import defaultdict
+class Solution:
+    # O(n)
+    def countComponents(self, n: int, edges: List[List[int]]) -> int:
+        edges_map = defaultdict(list)
+        visted_set = set()
+        num_components = 0
+        # O(n)
+        for edge in edges:
+            edges_map[edge[0]].append(edge[1])
+            edges_map[edge[1]].append(edge[0])
+
+        # O(n)
+        def visit_nodes(cur_node):
+            if cur_node in visted_set:
+                return
+            visted_set.add(cur_node)
+            for nei in edges_map[cur_node]:
+                visit_nodes(nei)
+
+        # O(n)
+        for i in range(n):
+            if i not in visted_set:
+                visit_nodes(i)
+                num_components += 1
+
+        return num_components
+
+# Medium (1/21/2024): https://leetcode.com/problems/insert-delete-getrandom-o1/
+        
+import random
+
+class RandomizedSet:
+
+    def __init__(self):
+        self.index_map = {}
+        self.nums = []
+
+    def insert(self, val: int) -> bool:
+        if val in self.index_map:
+            return False
+        self.nums.append(val)
+        self.index_map[val] = len(self.nums) -1
+        return True
+
+    def remove(self, val: int) -> bool:
+        if val not in self.index_map:
+            return False
+        i = self.index_map[val]
+        self.nums[i] = self.nums[-1]
+        self.index_map[self.nums[i]] = i
+        self.nums.pop()
+        del self.index_map[val]
+        return True
+
+    def getRandom(self) -> int:
+        return self.nums[random.randint(0, len(self.nums)-1)]
+
+
+# Your RandomizedSet object will be instantiated and called as such:
+# obj = RandomizedSet()
+# param_1 = obj.insert(val)
+# param_2 = obj.remove(val)
+# param_3 = obj.getRandom()
+
+class Solution:
+    def lengthOfLongestSubstringKDistinct(self, s: str, k: int) -> int:
+        l = 0
+        index_map = {}
+        max_len = 0
+
+        for r in range(len(s)):
+            if s[r] in index_map:
+                del index_map[s[r]]
+            index_map[s[r]] = r+1
+            if len(index_map) > k:
+                l = index_map[next(iter(index_map))]
+                del index_map[next(iter(index_map))]
+            max_len = max(max_len, r-l+1)
+
+        return max_len
+        
+        

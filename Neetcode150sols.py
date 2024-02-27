@@ -1253,7 +1253,7 @@ class Solution:
         for i in range(len_array-3, -1, -1):
             memoziation[i] = max(nums[i] + memoziation[i+2], memoziation[i+1])
 
-       return memoziation[0]
+        return memoziation[0]
 
 # Bottom Up
 class Solution:
@@ -1569,4 +1569,69 @@ class Solution:
         for cc in zeros_c:
             for k in range(r):
                 matrix[k][cc] = 0
+
+# Medium (1/22/2024): https://leetcode.com/problems/minimum-window-substring/
+
+from collections import defaultdict
+class Solution:
+    def minWindow(self, s: str, t: str) -> str:
+        if not t:
+            return ""
         
+        # Assumption both upper case and lower case are different
+        t_map = {} 
+        window_map = defaultdict(int)
+        best_case = [0,0]
+        res_len = float("inf")
+        for cur_char in t:
+            t_map[cur_char] = 1 + t_map.get(cur_char, 0)
+
+        have, need = 0, len(t_map)
+        l= 0
+        for r in range(len(s)):
+            c = s[r]
+            window_map[c] += 1
+
+            have += (c in t_map and t_map[c] == window_map[c])
+
+            while have == need:
+                if r - l+1 < res_len:
+                    best_case = [l, r]
+                    res_len = r - l+1
+                r_char = s[l]
+                window_map[r_char] -= 1
+                have -= (r_char in t_map and window_map[r_char] < t_map[r_char])
+                l += 1
+
+        l, r = best_case
+        return s[l:(r+1 if res_len != float("inf") else 0)]
+
+# Medium (1/22/2024): https://leetcode.com/problems/longest-repeating-character-replacement/
+
+from collections import defaultdict
+class Solution:
+    def characterReplacement(self, s: str, k: int) -> int:
+
+        maxLen = 0
+        window_freq = defaultdict(int)
+        l = 0 
+        max_char = s[l]
+
+        for r in range(len(s)):
+            c = s[r]
+            window_freq[c] += 1
+            if window_freq[c] > window_freq[max_char]:
+                max_char = c
+
+            while (r-l+1) - window_freq[max_char] > k:
+                l_char = s[l]
+                window_freq[l_char] -= 1
+                if l_char == max_char:
+                    for cur_char in window_freq:
+                        if window_freq[cur_char] > window_freq[max_char]:
+                            max_char = cur_char
+                l += 1
+
+            maxLen = max(maxLen, r-l+1)
+
+        return maxLen
